@@ -36,7 +36,7 @@
       <DisplayMultipleInventory>True</DisplayMultipleInventory>
       <ScriptAPIVersion>v340</ScriptAPIVersion>
       <ScriptCompatLevel>v321</ScriptCompatLevel>
-      <EnforceObjectBasedScript>True</EnforceObjectBasedScript>
+      <EnforceObjectBasedScript>False</EnforceObjectBasedScript>
       <EnforceNewStrings>True</EnforceNewStrings>
       <EnforceNewAudio>False</EnforceNewAudio>
       <UseOldCustomDialogOptionsAPI>False</UseOldCustomDialogOptionsAPI>

@@ -4,3 +4,6 @@
 
 # Re-indent all game scripts (tools/agsfmt.py)
 2c0ab4e5f09bb428bc56b80daf0177abd0550d5c
+
+# Re-indent all game scripts with 4 spaces (tools/agsfmt.py)
+f9f813ab9812cd3bc32603fffaa2258addb8af7b

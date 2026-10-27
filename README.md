@@ -173,6 +173,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Builds and runs in AGS 3.6.2.
     - Fixes 18 gameplay bugs. See [PORTING-NOTES.md](PORTING-NOTES.md).
     - Adds engine regression suites, build and playtest scripts.
+    - Re-indents every script consistently (whitespace only) and adds `tools/agsfmt.py`.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

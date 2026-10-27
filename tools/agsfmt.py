@@ -29,6 +29,7 @@ Usage: python tools/agsfmt.py [--check] [--report] FILE...
   --check   list files that would change and exit 1, without writing
   --report  list lines indented as a brace-less if/else/while body
 """
+import glob
 import re
 import sys
 
@@ -308,8 +309,17 @@ def format_text(text, report=None):
 def main(argv):
     check = "--check" in argv
     want_report = "--report" in argv
-    files = [a for a in argv if not a.startswith("--")]
-    rc = 0
+    files, rc = [], 0
+    for arg in argv:
+        if arg.startswith("--"):
+            continue
+        # Windows shells pass wildcards through unexpanded.
+        wild = any(c in arg for c in "*?[")
+        matches = sorted(glob.glob(arg)) if wild else [arg]
+        if not matches:
+            print(f"{arg}: no matching files", file=sys.stderr)
+            rc = 2
+        files.extend(matches)
     for name in files:
         with open(name, "rb") as fh:
             data = fh.read()

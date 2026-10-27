@@ -1,6 +1,6 @@
 // new module header
 
-import function customertalk(); 
+import function customertalk();
 import function customerlisten();
 
 import function Threetalk_M();

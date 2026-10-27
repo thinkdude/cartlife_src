@@ -1,0 +1,6 @@
+# Whitespace-only commits that `git blame` should look past.
+# GitHub's blame view reads this file automatically. Locally, run once:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Re-indent all game scripts (tools/agsfmt.py)
+2c0ab4e5f09bb428bc56b80daf0177abd0550d5c

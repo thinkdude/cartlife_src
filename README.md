@@ -40,10 +40,6 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 
 The full list, with what was wrong and how it was repaired, is in **[PORTING-NOTES.md](PORTING-NOTES.md)**. The evidence for each fix (before and after results) is in [TEST-RESULTS.md](TEST-RESULTS.md), and the player reports checked against this port are in [COMMUNITY-BUGS.md](COMMUNITY-BUGS.md).
 
-**Regression tests.** `tests/` has 15 automated tests that check the fixed bugs stay fixed. They run on a throwaway copy of the project, so they never touch your saves.
-
-**Not changed yet.** Resolution, widescreen, the save system and the overall code style are still as the original shipped them. See the [roadmap](#roadmap).
-
 ## Building
 
 You need Windows and [AGS 3.6.2](https://github.com/adventuregamestudio/ags/releases).
@@ -68,22 +64,7 @@ To play a test build with its own saves, separate from your real ones:
 ```powershell
 .\Start-Playtest.ps1 -Profile mytest
 ```
-
-To check that a fixed bug stays fixed, run one of the regression tests in `tests/`:
-
-```powershell
-.\tests\Run-Regression.ps1 -Suite Hotdog
-```
-
-Add `-Original` to run the same test on the code from before the fix, which shows the bug. The full list of tests is in `tests/Run-Regression.ps1`. These tests check the game's logic, so it's still worth playing through anything you change.
-
-## What's where
-
-- `cartlife/Game.agf`: the AGS project. Open this in the editor.
-- `cartlife/*.asc`: the game's scripts. Most of the logic is in `GlobalScript.asc` and `CustomFunctions.asc`.
-- `cartlife/room*`: the rooms and their scripts.
-- `tests/`: the regression tests.
-- `PORTING-NOTES.md`, `TEST-RESULTS.md`, `COMMUNITY-BUGS.md`: notes on the port, the test results, and the player bug reports behind the fixes.
+\
 
 ## Roadmap
 

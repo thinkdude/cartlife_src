@@ -8,7 +8,8 @@ write a file if that would not hold.
 
 Indentation follows the statement structure the AGS compiler sees, not just
 brace counting:
-  * 2 spaces per level; block contents are one level in from their braces.
+  * 4 spaces per level (as in PSR-2); block contents are one level in from
+    their braces.
   * a brace-less body of `if`/`else`/`while` is one level in from its header;
     `else` binds to the nearest unmatched `if` (as in AGS and C), and
     `else if` chains stay flat.
@@ -29,10 +30,11 @@ Usage: python tools/agsfmt.py [--check] [--report] FILE...
   --check   list files that would change and exit 1, without writing
   --report  list lines indented as a brace-less if/else/while body
 """
+import glob
 import re
 import sys
 
-INDENT = "  "
+INDENT = "    "
 IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 NUM_RE = re.compile(r"[0-9][A-Za-z0-9_.]*")
 CHAR_RE = re.compile(r"'(?:\\.|[^'\\])'")
@@ -308,8 +310,17 @@ def format_text(text, report=None):
 def main(argv):
     check = "--check" in argv
     want_report = "--report" in argv
-    files = [a for a in argv if not a.startswith("--")]
-    rc = 0
+    files, rc = [], 0
+    for arg in argv:
+        if arg.startswith("--"):
+            continue
+        # Windows shells pass wildcards through unexpanded.
+        wild = any(c in arg for c in "*?[")
+        matches = sorted(glob.glob(arg)) if wild else [arg]
+        if not matches:
+            print(f"{arg}: no matching files", file=sys.stderr)
+            rc = 2
+        files.extend(matches)
     for name in files:
         with open(name, "rb") as fh:
             data = fh.read()

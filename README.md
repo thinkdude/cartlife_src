@@ -101,6 +101,8 @@ The code is quite messy and needs lots of refactoring, and even just formatting,
 
 The original "Open Sores" cleanup followed something akin to the [PSR-2](https://www.php-fig.org/psr/psr-2/) standard as a style guide, as close as practicable in this language. New cleanup should follow it too.
 
+Indentation is the exception: the scripts use 2 spaces per level, the AGS editor's default. `python tools/agsfmt.py cartlife/*.asc cartlife/*.ash` re-indents them, and `--check` lists the files that need it. It only ever changes the blanks at the start and end of a line, so it can't change what the game does.
+
 Please add a Signed-off-by line, in the following format, to the end of each of your commit messages to certify that you adhere to the requirements of the [Developer Certificate of Origin](https://julien.ponge.org/blog/developer-certificate-of-origin-versus-contributor-license-agreements/) below:
 ```
 Signed-off-by: Vinny Bagelman <vinny.bagelman@example.com>
@@ -171,6 +173,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Builds and runs in AGS 3.6.2.
     - Fixes 18 gameplay bugs. See [PORTING-NOTES.md](PORTING-NOTES.md).
     - Adds engine regression suites, build and playtest scripts.
+    - Re-indents every script consistently (whitespace only) and adds `tools/agsfmt.py`.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

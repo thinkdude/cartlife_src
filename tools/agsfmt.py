@@ -8,7 +8,8 @@ write a file if that would not hold.
 
 Indentation follows the statement structure the AGS compiler sees, not just
 brace counting:
-  * 2 spaces per level; block contents are one level in from their braces.
+  * 4 spaces per level (as in PSR-2); block contents are one level in from
+    their braces.
   * a brace-less body of `if`/`else`/`while` is one level in from its header;
     `else` binds to the nearest unmatched `if` (as in AGS and C), and
     `else if` chains stay flat.
@@ -33,7 +34,7 @@ import glob
 import re
 import sys
 
-INDENT = "  "
+INDENT = "    "
 IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 NUM_RE = re.compile(r"[0-9][A-Za-z0-9_.]*")
 CHAR_RE = re.compile(r"'(?:\\.|[^'\\])'")

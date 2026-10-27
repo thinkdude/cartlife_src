@@ -41,6 +41,8 @@ if (-not $compilerGate.WaitOne(120000)) { $compilerGate.Dispose(); throw 'Timed 
 try {
     $compiler = Start-Process -FilePath $EditorPath -ArgumentList ('"' + $projectPath + '" /compile') `
         -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+    # Windows PowerShell 5.1 only reports ExitCode for a redirected process if its handle was read.
+    $null = $compiler.Handle
     if (-not $compiler.WaitForExit(120000)) {
         $compiler.Kill()
         throw "AGS compiler timed out. Inspect $stdoutPath and $stderrPath."

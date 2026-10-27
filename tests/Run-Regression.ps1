@@ -186,6 +186,8 @@ if (-not $compilerGate.WaitOne(120000)) { $compilerGate.Dispose(); throw 'Timed 
 try {
     $compile=Start-Process -FilePath $EditorPath -ArgumentList ('"'+$projectPath+'" /compile') `
         -WindowStyle Hidden -PassThru -RedirectStandardOutput $compileLog -RedirectStandardError (Join-Path $run 'compile-errors.log')
+    # Windows PowerShell 5.1 only reports ExitCode for a redirected process if its handle was read.
+    $null=$compile.Handle
     Write-Host "Regression compiler process $($compile.Id); evidence: $run"
     if (-not $compile.WaitForExit(120000)) {
         $compile.Kill()
@@ -204,6 +206,7 @@ $arguments='--windowed --background --audiodriver dummy --no-message-box --conf 
 $engine=Start-Process -FilePath (Join-Path $gameDirectory 'cartlife.exe') -WorkingDirectory $gameDirectory `
     -ArgumentList $arguments -WindowStyle Hidden -PassThru `
     -RedirectStandardOutput (Join-Path $run 'engine.log') -RedirectStandardError (Join-Path $run 'engine-errors.log')
+$null=$engine.Handle
 if (-not $engine.WaitForExit(60000)) {
     $engine.Kill()
     throw "Regression fixture timed out: $run"
@@ -214,6 +217,7 @@ if ($Suite -eq 'Startup' -and $engine.ExitCode -eq 0) {
     $fresh=Start-Process -FilePath (Join-Path $gameDirectory 'cartlife.exe') -WorkingDirectory $gameDirectory `
         -ArgumentList ($arguments+' --loadsavedgame 40') -WindowStyle Hidden -PassThru `
         -RedirectStandardOutput (Join-Path $run 'fresh-engine.log') -RedirectStandardError (Join-Path $run 'fresh-engine-errors.log')
+    $null=$fresh.Handle
     if (-not $fresh.WaitForExit(60000)) { $fresh.Kill(); throw "Fresh-process restore timed out: $run" }
     if ($fresh.ExitCode -ne 0) { throw "Fresh-process restore failed (exit $($fresh.ExitCode)): $run" }
 }

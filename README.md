@@ -7,8 +7,8 @@ This repository is a fork of [gondur/cartlife_src](https://github.com/gondur/car
 - [About the game](#about-the-game)
 - [What this fork changes](#what-this-fork-changes)
 - [Building](#building)
-- [Running and testing](#running-and-testing)
-- [Repository layout](#repository-layout)
+- [Testing](#testing)
+- [What's where](#whats-where)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -27,7 +27,7 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 
 ## What this fork changes
 
-**Engine upgrade.** The project was written in AGS 3.2.1 and later compiled in 3.4.0. It now opens, builds and runs in **AGS 3.6.2** (tested with editor 3.6.2.21). The upgrade needed a few small repairs: a stray unterminated string that 3.4 accepted, a brace the 3.6 editor's auto-inserted `SetRestartPoint()` split out of a comment, and Windows-1252 characters damaged by the editor's save.
+**Engine upgrade.** The game was made in AGS 3.2.1 and later moved to 3.4. It now builds and runs in **AGS 3.6.2**, after a few small script repairs.
 
 **Bug fixes.** 18 gameplay bugs are fixed, most of them reported by players on Steam, the original repository's [issue #2](https://github.com/gondur/cartlife_src/issues/2) and community walkthroughs. Highlights:
 
@@ -40,84 +40,50 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 
 The full list, with what was wrong and how it was repaired, is in **[PORTING-NOTES.md](PORTING-NOTES.md)**. The evidence for each fix (before and after results) is in [TEST-RESULTS.md](TEST-RESULTS.md), and the player reports checked against this port are in [COMMUNITY-BUGS.md](COMMUNITY-BUGS.md).
 
-**Regression tests.** `tests/` holds 15 engine-level regression suites (494 checks at the time of the 3.6 merge). Each one runs the game's real script code in a disposable copy of the project, so it does not touch your saves or add test hooks to the normal build.
+**Regression tests.** `tests/` has 15 automated tests that check the fixed bugs stay fixed. They run on a throwaway copy of the project, so they never touch your saves.
 
 **Not changed yet.** Resolution, widescreen, the save system and the overall code style are still as the original shipped them. See the [roadmap](#roadmap).
 
 ## Building
 
-You need Windows and **[AGS 3.6.2](https://github.com/adventuregamestudio/ags/releases)** (the editor is Windows-only). Other 3.6.x releases will likely work but are untested. AGS 4.0 is not supported.
+You need Windows and [AGS 3.6.2](https://github.com/adventuregamestudio/ags/releases).
 
-1. **Clone the repository.**
+1. Clone this repository.
+2. Extract `cartlife/acpsprset_DECOMPRESSME.part1.rar` into the `cartlife/` folder with 7-Zip or WinRAR (part 2 is picked up automatically). This gives you the sprite file, `acsprset.spr`.
+3. Open `cartlife/Game.agf` in AGS and choose **Build > Build EXE**.
 
-   ```
-   git clone https://github.com/thinkdude/cartlife_src.git
-   ```
+The game ends up in `cartlife/Compiled/Windows/cartlife.exe`.
 
-2. **Extract the sprite file.** The sprite file is large, so it ships compressed as a two-part RAR archive. Extract `cartlife/acpsprset_DECOMPRESSME.part1.rar` (with `part2` beside it) into the `cartlife/` folder. You should end up with `cartlife/acsprset.spr`, which git ignores. Use [7-Zip](https://www.7-zip.org/) or WinRAR, or from a command prompt in `cartlife/`:
+You can also build from PowerShell with `.\Build-CartLife.ps1`, which saves a log of each build in `build-logs/`.
 
-   ```
-   unrar x acpsprset_DECOMPRESSME.part1.rar
-   ```
+### Before you edit
 
-   Without this file the editor opens the project with every sprite missing.
+- The scripts are saved in Windows-1252, not UTF-8. The AGS editor sometimes turns special characters (like `è` or `•`) into `?` when it saves, so check your diff.
+- The game still uses some older AGS settings, such as the old audio system. Leave them as they are unless you're ready to update the scripts too.
 
-3. **Build.** Either:
+## Testing
 
-   - open `cartlife/Game.agf` in the AGS 3.6.2 editor and choose **Build > Build EXE**, or
-   - from PowerShell, run the build script, which writes dated compiler logs to `build-logs/` and fails if the project is open in an editor or the game is running:
-
-     ```powershell
-     .\Build-CartLife.ps1
-     # Different install location:
-     .\Build-CartLife.ps1 -EditorPath 'D:\AGS\AGSEditor.exe'
-     ```
-
-   The game is written to `cartlife/Compiled/Windows/cartlife.exe`. Keep it together with the data, audio and DLL files beside it.
-
-### Things to know before editing
-
-- **Script encoding.** The scripts and `Game.agf` use Windows-1252, not UTF-8. The 3.6 editor can turn characters such as `•`, `è` and `â` into `?` when it saves. Check `git diff` after saving in the editor, and keep your own editor in Windows-1252 when changing script files.
-- **Project settings.** The game still uses the old audio API (`EnforceNewAudio` off), old-style global functions such as `SetGlobalInt` (`EnforceObjectBasedScript` off) and script compatibility level v321. Changing these will break the build until the scripts are updated.
-- **Close the editor before a command-line build.** AGS locks the project while it is open.
-- **Old saves.** AGS 3.6.2 can read saves from 3.2 and later, but saves made with the original game are not guaranteed to load in this build because the scripts changed.
-
-## Running and testing
-
-**Play a build** by running `cartlife/Compiled/Windows/cartlife.exe`, or use the playtest script, which starts the game windowed with its own save folder so it doesn't mix with your real saves:
+To play a test build with its own saves, separate from your real ones:
 
 ```powershell
-.\Start-Playtest.ps1 -Profile mytest          # saves and logs go to .playtest\mytest
-.\Start-Playtest.ps1 -Profile mytest -LoadSlot 4
+.\Start-Playtest.ps1 -Profile mytest
 ```
 
-**Run a regression suite** with `tests/Run-Regression.ps1`. Add `-Original` to run the same checks against the code from before the fix, which is expected to fail and shows the bug the suite covers.
+To check that a fixed bug stays fixed, run one of the regression tests in `tests/`:
 
 ```powershell
 .\tests\Run-Regression.ps1 -Suite Hotdog
-.\tests\Run-Regression.ps1 -Suite Hotdog -Original
-.\tests\Run-Regression.ps1 -Suite Startup -Character Melanie
 ```
 
-Suites: `Withdrawal`, `Startup`, `HotelStairs`, `Saves`, `SaveSelection`, `CashRegister`, `RegisterTiming`, `Hotdog`, `Shopping`, `Inventory`, `Equipment`, `Cooking`, `CommunityBagels`, `OrderChoices`, `StandPurchase`.
+Add `-Original` to run the same test on the code from before the fix, which shows the bug. The full list of tests is in `tests/Run-Regression.ps1`. These tests check the game's logic, so it's still worth playing through anything you change.
 
-The suites check game logic directly. They don't replace a full playthrough with mouse and keyboard, so please still play through anything you change.
+## What's where
 
-## Repository layout
-
-| Path | What it is |
-| --- | --- |
-| `cartlife/Game.agf` | The AGS project. Open this in the editor. |
-| `cartlife/GlobalScript.asc` | Main game logic. |
-| `cartlife/CustomFunctions.asc`, `DialogRequesting.asc`, `customertalk+listen.asc`, `AskOnly.asc` | Shared script modules: commerce, dialogue, customer conversations. |
-| `cartlife/room*.asc`, `room*.crm` | Per-room scripts and room files. |
-| `cartlife/acpsprset_DECOMPRESSME.part*.rar` | The sprite file, compressed (see [Building](#building)). |
-| `cartlife/AudioCache/` | Music and sound effects. |
-| `Build-CartLife.ps1`, `Start-Playtest.ps1` | Build and playtest helpers. |
-| `tests/` | Regression suites and their runner. |
-| `PORTING-NOTES.md`, `TEST-RESULTS.md`, `COMMUNITY-BUGS.md` | What changed in the port, the evidence, and the player reports behind it. |
-
-Build logs (`build-logs/`), playtest profiles (`.playtest/`) and compiled output (`cartlife/Compiled/Windows`, `Linux`, `Data`) are local only and ignored by git.
+- `cartlife/Game.agf`: the AGS project. Open this in the editor.
+- `cartlife/*.asc`: the game's scripts. Most of the logic is in `GlobalScript.asc` and `CustomFunctions.asc`.
+- `cartlife/room*`: the rooms and their scripts.
+- `tests/`: the regression tests.
+- `PORTING-NOTES.md`, `TEST-RESULTS.md`, `COMMUNITY-BUGS.md`: notes on the port, the test results, and the player bug reports behind the fixes.
 
 ## Roadmap
 
@@ -138,7 +104,7 @@ For pull requests:
 - Keep each pull request to one bug or one change.
 - Build with AGS 3.6.2 and run the regression suites that touch your change. If you fix a bug that can be reproduced in script, add a check for it.
 - Keep fixes and reformatting in separate pull requests.
-- Check that your diff didn't damage Windows-1252 characters (see [Things to know before editing](#things-to-know-before-editing)).
+- Check that your diff didn't damage Windows-1252 characters (see [Before you edit](#before-you-edit)).
 
 The code is quite messy and needs lots of refactoring, and even just formatting, to be readable. As RH notes in the code:
 ```

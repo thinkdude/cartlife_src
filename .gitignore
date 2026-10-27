@@ -1,3 +1,12 @@
 acsprset.spr
 backup_acsprset.spr
 
+# Local build reports, recovery checkpoints and isolated playtests.
+/build-logs/
+/.checkpoints/
+/.playtest/
+/cartlife/Compiled/Data/
+/cartlife/Compiled/Windows/
+/cartlife/Compiled/Linux/
+/cartlife/_OpenInEditor.lock
+

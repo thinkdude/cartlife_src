@@ -6,6 +6,7 @@ import function NewScores(int Slot, int Newvalue);
 import function breakaway(this Character*);
 import function chasedown(this Character*);
 import function NatMusic(int sng);
+import function ApplyMusicVolume();
 
 
 //Orphaned Functions

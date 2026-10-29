@@ -179,6 +179,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Replaces the 40 copies of the code that sets the music volume from the options slider with one `ApplyMusicVolume()` function.
     - Replaces the 8 copies of the long "sellable room" check in `GlobalScript.asc` with one `IsSellableRoom()` function.
     - Replaces the 10 copies of a customer's yes to a hot dog topping with one `CustomerSaysYes()` function.
+    - Replaces the 87 copies of the code that plays a random door sound in the rooms with `PlayDoorOpenSound()` and `PlayDoorCloseSound()`.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

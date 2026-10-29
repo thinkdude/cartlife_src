@@ -149,8 +149,8 @@ import function QaHotelTick();
     $hotelPath=Join-Path $project 'room7.asc'
     $hotel=[IO.File]::ReadAllText($hotelPath,$encoding)
     # Force only the input conditions; execute the existing stair bodies unchanged.
-    $hotel=$hotel.Replace('if ((IsKeyPressed(372)==1)||(IsKeyPressed(87)==1))','if (QaForceStairs())')
-    $hotel=$hotel.Replace('if ((IsKeyPressed(380)==1)||(IsKeyPressed(83)==1))','if (QaForceStairs())')
+    $hotel=$hotel.Replace('if ((IsKeyPressed(eKeyUpArrow)==1)||(IsKeyPressed(eKeyW)==1))','if (QaForceStairs())')
+    $hotel=$hotel.Replace('if ((IsKeyPressed(eKeyDownArrow)==1)||(IsKeyPressed(eKeyS)==1))','if (QaForceStairs())')
     $hotel=$hotel.Replace('function room_RepExec(){','function QaOriginalRepExec(){')
     $hotel+=@'
 

@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
-"""Whitespace-only re-indenter for AGS scripts (.asc/.ash).
+"""Whitespace-only formatter for AGS scripts (.asc/.ash).
 
-Only the leading and trailing blanks of each line change and the number of
-lines stays the same, so every line maps 1:1 onto the original and the
-compiler sees the same tokens on the same line numbers. The tool refuses to
-write a file if that would not hold.
+It changes only blanks and line breaks, never the code or the comments, and
+refuses to write a file if that would not hold.
+
+Block layout (skipped with --indent-only): a block whose braces are on
+different lines gets no code after its `{` and none before its `}`, and code
+after its `}` moves to the next line unless it is `else` or `;`. One-line
+blocks and lines with several statements stay as they are, and braces stay
+on the line they were on. Lines are only ever split, just before a token, so
+every token and comment keeps its order, and every comment stays after the
+same token on the same line.
+
+With --indent-only only the leading and trailing blanks of each line change
+and the number of lines stays the same, so the compiler sees the same tokens
+on the same line numbers.
 
 Indentation follows the statement structure the AGS compiler sees, not just
 brace counting:
@@ -26,9 +36,10 @@ brace counting:
 Files are handled as bytes (decoded as latin-1, which is lossless), so
 Windows-1252 text is preserved byte for byte. LF and CRLF files both work.
 
-Usage: python tools/agsfmt.py [--check] [--report] FILE...
-  --check   list files that would change and exit 1, without writing
-  --report  list lines indented as a brace-less if/else/while body
+Usage: python tools/agsfmt.py [--check] [--indent-only] [--report] FILE...
+  --check        list files that would change and exit 1, without writing
+  --indent-only  only re-indent: keep every line break where it is
+  --report       list lines indented as a brace-less if/else/while body
 """
 import glob
 import re
@@ -45,10 +56,10 @@ class FormatError(Exception):
 
 
 class Tok:
-    __slots__ = ("val", "line", "level")
+    __slots__ = ("val", "line", "col", "level")
 
-    def __init__(self, val, line):
-        self.val, self.line, self.level = val, line, None
+    def __init__(self, val, line, col):
+        self.val, self.line, self.col, self.level = val, line, col, None
 
     def __repr__(self):
         return f"{self.val!r} on line {self.line + 1}"
@@ -57,12 +68,14 @@ class Tok:
 def tokenize(lines):
     """Split the script into tokens and classify each line.
 
-    Returns (tokens, kinds, comment_opener). kinds[i] is 'blank', 'pp'
-    (preprocessor), 'comment' (comment only), 'code', 'incomment' (starts
-    inside a /* */ comment) or 'incomment+code'. comment_opener maps each
-    'incomment' line to the line where its comment opened.
+    Returns (tokens, kinds, comment_opener, comments). kinds[i] is 'blank',
+    'pp' (preprocessor), 'comment' (comment only), 'code', 'incomment'
+    (starts inside a /* */ comment) or 'incomment+code'. comment_opener maps
+    each 'incomment' line to the line where its comment opened. comments
+    lists (text, index of the token before it, whether that token is on the
+    comment's first line).
     """
-    toks, kinds, opener_of = [], [], {}
+    toks, kinds, opener_of, comments = [], [], {}, []
     in_block, opener = False, None
     for ln, raw in enumerate(lines):
         s = raw.strip(" \t")
@@ -83,14 +96,18 @@ def tokenize(lines):
             if in_block:
                 j = raw.find("*/", i)
                 if j < 0:
+                    comments[-1][0].append(raw[i:])
                     break
+                comments[-1][0].append(raw[i:j + 2])
                 in_block = False
                 i = j + 2
             elif c in " \t":
                 i += 1
             elif raw.startswith("//", i):
+                comments.append(([raw[i:]], len(toks) - 1, had_code))
                 break
             elif raw.startswith("/*", i):
+                comments.append((["/*"], len(toks) - 1, had_code))
                 in_block, opener = True, ln
                 i += 2
             else:
@@ -110,7 +127,7 @@ def tokenize(lines):
                 else:
                     m = IDENT_RE.match(raw, i) or NUM_RE.match(raw, i)
                     end = m.end() if m else i + 1
-                toks.append(Tok(raw[i:end], ln))
+                toks.append(Tok(raw[i:end], ln, i))
                 i = end
         if kinds[ln] is None:
             kinds[ln] = "code" if had_code else "comment"
@@ -118,7 +135,9 @@ def tokenize(lines):
             kinds[ln] = "incomment+code"
     if in_block:
         raise FormatError("unterminated /* comment")
-    return toks, kinds, opener_of
+    comments = [(" ".join(" ".join(parts).split()), prev, same)
+                for parts, prev, same in comments]
+    return toks, kinds, opener_of, comments
 
 
 class Parser:
@@ -127,6 +146,7 @@ class Parser:
     def __init__(self, toks):
         self.t, self.i = toks, 0
         self.flow = set()  # tokens inside a brace-less control body
+        self.blocks = []  # (index of "{", index of "}") of every brace pair
 
     def peek(self):
         return self.t[self.i] if self.i < len(self.t) else None
@@ -179,17 +199,21 @@ class Parser:
                 return
 
     def member_list(self, level):
+        start = self.i
         self.expect("{", level)
         while not self.at("}"):
             tok = self.take(level + 1)
             if tok.val == "{":
                 raise FormatError(f"nested brace in struct/enum at {tok!r}")
+        self.blocks.append((start, self.i))
         self.take(level)
 
     def block(self, level):
+        start = self.i
         self.expect("{", level)
         while not self.at("}"):
             self.statement(level + 1)
+        self.blocks.append((start, self.i))
         self.take(level)
 
     def body(self, level):
@@ -252,7 +276,43 @@ class Parser:
             tok = self.take(level + 2)
 
 
-def format_text(text, report=None):
+def split_blocks(lines):
+    """Split lines so multi-line blocks don't share lines with their code.
+
+    A block whose braces are on different lines gets no code after its `{`
+    and none before its `}` on the same line, and code after its `}` moves
+    to the next line unless it is `else` or `;`. One-line blocks and lines
+    with several statements are left alone, and nothing is ever joined, so
+    only line breaks are added, always just before a token.
+    """
+    toks, _, _, _ = tokenize(lines)
+    parser = Parser(toks)
+    parser.toplevel()
+    cut = set()
+    for o, c in parser.blocks:
+        if toks[o].line == toks[c].line:
+            continue
+        if toks[o + 1].line == toks[o].line:
+            cut.add(o + 1)
+        if toks[c - 1].line == toks[c].line:
+            cut.add(c)
+        if (c + 1 < len(toks) and toks[c + 1].line == toks[c].line
+                and toks[c + 1].val not in ("else", ";")):
+            cut.add(c + 1)
+    cols = {}
+    for idx in sorted(cut):
+        cols.setdefault(toks[idx].line, []).append(toks[idx].col)
+    out = []
+    for ln, raw in enumerate(lines):
+        start = 0
+        for col in cols.get(ln, ()):
+            out.append(raw[start:col].rstrip(" \t"))
+            start = col
+        out.append(raw[start:])
+    return out
+
+
+def format_text(text, report=None, blocks=True):
     eol = "\n"
     lines = text.split("\n")
     if lines and lines[-1] == "":
@@ -263,7 +323,10 @@ def format_text(text, report=None):
     if any("\r" in l for l in lines):
         raise FormatError("mixed or bare CR line endings")
 
-    toks, kinds, opener_of = tokenize(lines)
+    original = lines
+    if blocks:
+        lines = split_blocks(lines)
+    toks, kinds, opener_of, comments = tokenize(lines)
     parser = Parser(toks)
     parser.toplevel()
 
@@ -300,16 +363,24 @@ def format_text(text, report=None):
         else:
             out.append(INDENT * level[ln] + body)
 
-    # Safety net: never change anything but leading/trailing blanks.
+    # Safety nets. Re-indenting changes only leading/trailing blanks...
     if len(out) != len(lines) or any(
             a.strip(" \t") != b.strip(" \t") for a, b in zip(lines, out)):
         raise FormatError("internal error: non-whitespace change")
+    # ...and splitting blocks keeps every token and comment, in order and
+    # each comment after the same token, so the compiler sees the same code.
+    if blocks:
+        old_toks, _, _, old_comments = tokenize(original)
+        if ([t.val for t in old_toks] != [t.val for t in toks]
+                or old_comments != comments):
+            raise FormatError("internal error: code or comments changed")
     return eol.join(out) + eol
 
 
 def main(argv):
     check = "--check" in argv
     want_report = "--report" in argv
+    blocks = "--indent-only" not in argv
     files, rc = [], 0
     for arg in argv:
         if arg.startswith("--"):
@@ -326,7 +397,8 @@ def main(argv):
             data = fh.read()
         report = [] if want_report else None
         try:
-            new = format_text(data.decode("latin-1"), report).encode("latin-1")
+            new = format_text(data.decode("latin-1"), report, blocks)
+            new = new.encode("latin-1")
         except FormatError as e:
             print(f"{name}: {e}", file=sys.stderr)
             rc = 2

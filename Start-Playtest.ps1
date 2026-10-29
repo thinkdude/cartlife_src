@@ -36,6 +36,8 @@ $process = Start-Process -FilePath $gamePath -WorkingDirectory $gameDirectory `
     -ArgumentList ($arguments -join ' ') -WindowStyle Normal -PassThru `
     -RedirectStandardOutput (Join-Path $profileDirectory "$runId.stdout.log") `
     -RedirectStandardError (Join-Path $profileDirectory "$runId.stderr.log")
+# Windows PowerShell 5.1 only reports ExitCode for a redirected process if its handle was read.
+$null = $process.Handle
 Write-Host "Playtest process $($process.Id); profile: $Profile; saves: $saveDirectory; log: $logPath"
 $process.WaitForExit()
 if ($process.ExitCode -ne 0) { throw "Playtest exited with code $($process.ExitCode). Inspect $logPath." }

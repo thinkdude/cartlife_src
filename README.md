@@ -176,6 +176,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Reformats every script consistently (4-space indents, braces of multi-line blocks on their own lines; whitespace and line breaks only) and adds `tools/agsfmt.py`.
     - Names the key in every `IsKeyPressed` check, such as `eKeyUpArrow` instead of `372`.
     - Names the GlobalInt slots, such as `GetGlobalInt(GI_CHARACTER)` instead of `GetGlobalInt(1)`. The names and what each slot holds are at the top of `customertalk+listen.ash`.
+    - Replaces the 40 copies of the code that sets the music volume from the options slider with one `ApplyMusicVolume()` function.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

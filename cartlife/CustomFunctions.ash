@@ -7,6 +7,8 @@ import function breakaway(this Character*);
 import function chasedown(this Character*);
 import function NatMusic(int sng);
 import function ApplyMusicVolume();
+import function PlayDoorOpenSound();
+import function PlayDoorCloseSound();
 
 
 //Orphaned Functions

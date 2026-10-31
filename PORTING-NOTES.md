@@ -33,6 +33,15 @@
 21. The street rooms' edge check only sends characters in the current room to room 24. It used to move any character standing at x 0-2 or 748+ in any room, so characters vanished from other rooms.
 22. Faith's dialog requests 123 and 478-480 exist. Turning down her test now records "no thanks" (state 2), which unlocks her existing "broken-hearted" re-offer, and the player's answer to "Was it hard?" is shown.
 23. Ask-about answers are given once. The topic list is split over two if/else chains (AGS limits nesting), and every topic the first chain answered also fell into the second chain's "I guess I really don't know." and reopened the topic list.
+24. Eddie's relationship no longer resets every night. The three overnight Barneys-plot steps reset it only when that step actually happens (their missing braces made the reset run every night), and a separate line still lets his one-day "angries" (2) pass overnight. His "perma-hate" (4) now lasts.
+25. Eddie's "not angry" checks read his relationship. `GetGlobalInt(423!=2)` read slot 1 (the current character), so an angry Eddie also said "Hello, vendor.", gave his normal ask-about answer and made small talk right after asking you to leave.
+26. The Hollow Stump music flag has its own GlobalInt slot (225). It shared slot 201 with George's conversation state, so getting George's key unlocked the track without its notice, and visiting the bridge by day skipped George's first conversation. In a save made before this change the track shows as locked until the next daytime visit to the bridge.
+27. Basinski marks himself, not The Three, as done for the day, and walking away from him no longer clears his own flag. The Three no longer skip a day after Basinski buys, and Basinski no longer comes back the same day.
+28. An "everything" hot dog charges for sauerkraut and uses one portion when the customer says yes to it. The answer was shown but neither the price nor the stock changed.
+29. Sold-out special bagels 2-4 are taken off the menu. The run-out check looked for bagel 1's name on the menu for all four slots.
+30. The smallest fast-service bonus, for finishing a step at 3 seconds, is paid (3 places). Its check was `(cd_seconds<=3)&&(cd_seconds>4)`, which is never true.
+31. Up/W (and Down/S in room 2) respect the open-menu checks in 16 door checks over 9 rooms. `&&` binds tighter than `||`, so only W/S were blocked while a menu was open and the arrow key still walked through the door.
+32. George's newspaper price complaint matches the price. `(PaperPrice>1.00)<(PaperPrice<2.00)` compared two true/false values, so he said "Why more than one dollar for news?" at $1.00 or less and never between $1 and $2.
 
 Script edits retain the existing Windows-1252 encoding. Existing local conversion and source changes have been preserved.
 

@@ -29,7 +29,7 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 
 **Engine upgrade.** The game was made in AGS 3.2.1 and later moved to 3.4. It now builds and runs in **AGS 3.6.2**, after a few small script repairs.
 
-**Bug fixes.** 18 gameplay bugs are fixed, most of them reported by players on Steam, the original repository's [issue #2](https://github.com/gondur/cartlife_src/issues/2) and community walkthroughs. Highlights:
+**Bug fixes.** 23 gameplay bugs are fixed, most of them reported by players on Steam, the original repository's [issue #2](https://github.com/gondur/cartlife_src/issues/2) and community walkthroughs. Highlights:
 
 - Andrus no longer freezes in his cough pose, and nicotine withdrawal recovers properly.
 - Manual saves no longer overwrite each other or the character autosaves, and selecting nothing in the save menu no longer crashes.
@@ -37,6 +37,7 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 - Hot-dog and bagel orders charge the right toppings, use ingredients once, and no longer crash with a four-item menu.
 - Purchases deliver what you paid for and record the right expense, and Melanie can no longer buy the $1200 stand into debt.
 - Short arrow-key taps select a character on the title screen.
+- Customers keep coming, a customer can't crash the game by ordering from an empty menu, characters no longer vanish from other rooms, and ask-about answers no longer repeat "I guess I really don't know."
 
 The full list, with what was wrong and how it was repaired, is in **[PORTING-NOTES.md](PORTING-NOTES.md)**. The evidence for each fix (before and after results) is in [TEST-RESULTS.md](TEST-RESULTS.md), and the player reports checked against this port are in [COMMUNITY-BUGS.md](COMMUNITY-BUGS.md).
 
@@ -180,6 +181,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Replaces the 8 copies of the long "sellable room" check in `GlobalScript.asc` with one `IsSellableRoom()` function.
     - Replaces the 10 copies of a customer's yes to a hot dog topping with one `CustomerSaysYes()` function.
     - Replaces the 87 copies of the code that plays a random door sound in the rooms with `PlayDoorOpenSound()` and `PlayDoorCloseSound()`.
+    - Fixes 5 more bugs from the ranked bug list: customers that stop coming, a crash ordering from an empty menu, characters vanishing from other rooms, Faith's missing test replies, and doubled ask-about answers. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 19-23.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

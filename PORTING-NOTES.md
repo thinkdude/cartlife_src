@@ -28,6 +28,11 @@
 16. Order confirmation never reads beyond the menu's item count. Short topping names and equal-height answer labels fit all regular bagel variants in every answer position.
 17. Bagel topping orders preserve their accepted type, include the extra charge, receive a fresh typing phrase and credit the complete sale. Ingredients are consumed once per sale or wasted preparation; toasted bagels preserve cream cheese.
 18. Melanie's $1200 stand purchase rejects insufficient funds before charging or entering the design step.
+19. The pedestrian timer is re-armed on every roll. A roll of exactly 5 used to leave it unarmed, so no more customers came until the cart moved or the player travelled.
+20. A customer can no longer order from an empty menu. George asks the time instead of buying, Nelly leaves Melanie as she leaves Andrus when there are no papers, and `Spin()`/`sellRandom()` no longer read `Menu.Items` with a stale index when the menu is empty.
+21. The street rooms' edge check only sends characters in the current room to room 24. It used to move any character standing at x 0-2 or 748+ in any room, so characters vanished from other rooms.
+22. Faith's dialog requests 123 and 478-480 exist. Turning down her test now records "no thanks" (state 2), which unlocks her existing "broken-hearted" re-offer, and the player's answer to "Was it hard?" is shown.
+23. Ask-about answers are given once. The topic list is split over two if/else chains (AGS limits nesting), and every topic the first chain answered also fell into the second chain's "I guess I really don't know." and reopened the topic list.
 
 Script edits retain the existing Windows-1252 encoding. Existing local conversion and source changes have been preserved.
 

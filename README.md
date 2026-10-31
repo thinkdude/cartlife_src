@@ -181,6 +181,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Replaces the 8 copies of the long "sellable room" check in `GlobalScript.asc` with one `IsSellableRoom()` function.
     - Replaces the 10 copies of a customer's yes to a hot dog topping with one `CustomerSaysYes()` function.
     - Replaces the 87 copies of the code that plays a random door sound in the rooms with `PlayDoorOpenSound()` and `PlayDoorCloseSound()`.
+    - Removes 22 script functions that nothing calls and that no game event uses, such as leftover copies of character talk code and handlers for GUI buttons that no longer exist.
     - Fixes 5 more bugs from the ranked bug list: customers that stop coming, a crash ordering from an empty menu, characters vanishing from other rooms, Faith's missing test replies, and doubled ask-about answers. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 19-23.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4

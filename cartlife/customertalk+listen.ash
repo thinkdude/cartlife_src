@@ -96,7 +96,7 @@
 // 0: nothing, 1: drank coffee, 2: told about comics, 3: gave comics,
 // 4: let's meet tomorrow, 5: pending, 6: finished
 #define GI_MARCUS_STATE 200
-// George conversation state. Shares slot 201 with GI_MUSIC_HOLLOWSTUMP.
+// George conversation state.
 #define GI_GEORGE_STATE 201
 // 0: permit needs checking, 1: OK
 #define GI_PERMIT_CHECKED 325
@@ -133,8 +133,8 @@
 #define GI_DREAM_LAUNCHED 496
 
 // Music unlocked (1: unlocked)
-// Bridge, day. Shares slot 201 with GI_GEORGE_STATE.
-#define GI_MUSIC_HOLLOWSTUMP 201
+// Bridge, day. Was slot 201, shared with GI_GEORGE_STATE; moved to a free slot.
+#define GI_MUSIC_HOLLOWSTUMP 225
 #define GI_MUSIC_DOMENZ79 202
 // Map
 #define GI_MUSIC_NOISEPULSE 203

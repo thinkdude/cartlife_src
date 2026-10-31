@@ -160,3 +160,4 @@ import int hunger[];
 import int que[10];
 import int maxque;
 import int queposition;
+import bool everything_kraut;

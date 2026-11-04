@@ -42,6 +42,17 @@
 30. The smallest fast-service bonus, for finishing a step at 3 seconds, is paid (3 places). Its check was `(cd_seconds<=3)&&(cd_seconds>4)`, which is never true.
 31. Up/W (and Down/S in room 2) respect the open-menu checks in 16 door checks over 9 rooms. `&&` binds tighter than `||`, so only W/S were blocked while a menu was open and the arrow key still walked through the door.
 32. George's newspaper price complaint matches the price. `(PaperPrice>1.00)<(PaperPrice<2.00)` compared two true/false values, so he said "Why more than one dollar for news?" at $1.00 or less and never between $1 and $2.
+33. Two leftover debug popups are gone: a "Vinnylove();" box when Vinny buys from Melanie, and "Getting through?" when clicking with the keys cursor.
+34. Basinski, Su Chin and Seany get their own ask-about answers. Six branches compared the customer against "Baskinski", "Su Chin" and "Seanny", but the game sets "Basinski", "Suchin" and "Seany".
+35. "The Flying Pizzeria" topic is answered. One place added it as "Pizzeria" and the handler checked "Pizzaria"; the handler now accepts both (older saves keep the old spelling) and both places add "Pizzeria".
+36. Selling the wallet at the pawn shop no longer also plays the "No, thanks." lines. Option 1 of dialog dPwnWallet had no `stop`.
+37. Two options in Andrus and Toney's trailer chat do something. "Things are great..." (dTrailer1) and "Your newspaper is $1.50." (dTrailer2) both ran request 615, which didn't exist. dTrailer2's option now runs a new request 619. Each shows the player's line, then Toney's existing closing lines from request 614 and his coffee order.
+38. The giveaway popup names the item. Its text `"Lost one !"` was missing its `%s`.
+39. The expense log says $1000.00 for the new hot dog cart, not $100.00. The money taken was already right.
+40. Room 14 makes the stand visible when it is in room 14. It checked room 10, a copy-paste slip; every other street room checks itself.
+41. Melody is placed at (x, y) rather than (y, x) when following the player into room 15. Room 15 re-places her on entry, so this was mostly hidden.
+42. With 15 or more menu items, every item can be ordered. `Spin()` rolled `Random(13)` for any menu of 14 or more.
+43. Two inventory items respond when offered at the pawn shop like their siblings: the Brennan permit (`Permit_brennan_Talk`) and the second room A-3 key (`A3Key2_Talk`). Both handlers were written but not linked in Game.agf.
 
 Script edits retain the existing Windows-1252 encoding. Existing local conversion and source changes have been preserved.
 

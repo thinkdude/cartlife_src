@@ -27309,7 +27309,7 @@
               <ScriptModule>GlobalScript.asc</ScriptModule>
               <Event Index="0">Permit_brennan_Look</Event>
               <Event Index="1" />
-              <Event Index="2" />
+              <Event Index="2">Permit_brennan_Talk</Event>
               <Event Index="3" />
               <Event Index="4" />
             </Interactions>
@@ -29133,7 +29133,7 @@
               <ScriptModule>GlobalScript.asc</ScriptModule>
               <Event Index="0">A3Key2_Look</Event>
               <Event Index="1" />
-              <Event Index="2" />
+              <Event Index="2">A3Key2_Talk</Event>
               <Event Index="3" />
               <Event Index="4" />
             </Interactions>
@@ -40926,6 +40926,7 @@ stop
 return
 @1
 run-script 471
+stop
 @2
 run-script 183
 stop
@@ -42798,7 +42799,7 @@ return
 run-script 614
 stop
 @2
-run-script 615
+run-script 619
 stop]]></Script>
             <DialogOptions>
               <DialogOption>

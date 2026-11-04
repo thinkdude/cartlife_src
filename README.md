@@ -183,6 +183,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Replaces the 8 copies of the long "sellable room" check in `GlobalScript.asc` with one `IsSellableRoom()` function.
     - Replaces the 10 copies of a customer's yes to a hot dog topping with one `CustomerSaysYes()` function.
     - Replaces the 87 copies of the code that plays a random door sound in the rooms with `PlayDoorOpenSound()` and `PlayDoorCloseSound()`.
+    - Removes 22 script functions that nothing calls and that no game event uses, such as leftover copies of character talk code and handlers for GUI buttons that no longer exist.
     - Fixes 5 more bugs from the ranked bug list: customers that stop coming, a crash ordering from an empty menu, characters vanishing from other rooms, Faith's missing test replies, and doubled ask-about answers. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 19-23.
     - Fixes 9 Tier 2 bugs: Eddie's relationship resetting every night and his "not angry" check, the Hollow Stump music flag sharing George's slot, Basinski setting The Three's daily flag, unbilled sauerkraut on "everything" hot dogs, sold-out special bagels staying on the menu, the fast-service bonus never paying, arrow keys ignoring open menus at doors, and George's newspaper price complaint. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 24-32.
 - #####  "Open Sores" 0.1 - 2017-06-30

@@ -180,6 +180,52 @@
 // Credits
 #define GI_MUSIC_CONDIMENTS 224
 
+// Names for the timer slots used with SetTimer and IsTimerExpired. Slots 1
+// to 3 do the same job in every room that uses them. Slots 4 and 5 do a
+// different job in each room, so they have one name per job.
+// The mannerism cycle: idle animations of the people in a room
+#define TIMER_MANNERISM 1
+// Room 1: the character-select plate animation
+#define TIMER_CHARSELECT_ANIM 1
+// Passers-by and customers at the stand (the game calls it the commerce timer)
+#define TIMER_COMMERCE 2
+// The pause between TalkPop() and the start of a conversation
+#define TIMER_TALK_START 3
+// Room 2: Seth arrives for Laura
+#define TIMER_SETH_ARRIVES 4
+// Room 5: the crow's idle animation
+#define TIMER_CROW_MANNERISM 4
+// Rooms 12 and 35: Alice or Dwayne stops working when the player comes close
+#define TIMER_NPC_PAUSE 4
+// Rooms 12 and 35: Alice or Dwayne goes back to work
+#define TIMER_NPC_RESUME 5
+// Room 14: Toney's animation before he walks off
+#define TIMER_TONEY_ANIM 4
+// Room 16: Troy's drink
+#define TIMER_TROY_DRINK 4
+// Room 18: the queue number display moves on
+#define TIMER_NOW_SERVING 4
+// Room 29: the end of the dream
+#define TIMER_WAKE_UP 4
+// Room 32: the lift ride
+#define TIMER_LIFT 5
+// Room 25: the splash screen, then character select
+#define TIMER_SPLASH 9
+// Room 5: the start of Andrus's intro
+#define TIMER_ANDRUS_INTRO 10
+// Rooms 2, 5 and 6: the second half of the tutorial
+#define TIMER_TUTORIAL_PART2 11
+// Room 7: Suchin comes back after the talk with Mr. Glembovski
+#define TIMER_SUCHIN_RETURNS 14
+// How long the info popup stays up
+#define TIMER_INFO_HIDE 17
+// The delay before the info popup's picture appears
+#define TIMER_INFO_SHOW 18
+// Andrus's nicotine withdrawal fits
+#define TIMER_WITHDRAWAL 19
+// Room 40: the loading screen
+#define TIMER_LOADING 20
+
 import function customertalk();
 import function customerlisten();
 

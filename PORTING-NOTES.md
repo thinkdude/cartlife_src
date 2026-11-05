@@ -54,6 +54,20 @@
 42. With 15 or more menu items, every item can be ordered. `Spin()` rolled `Random(13)` for any menu of 14 or more.
 43. Two inventory items respond when offered at the pawn shop like their siblings: the Brennan permit (`Permit_brennan_Talk`) and the second room A-3 key (`A3Key2_Talk`). Both handlers were written but not linked in Game.agf.
 
+## AGS 3.6 behaviour adjustments
+
+These places behaved differently once the game was rebuilt with AGS 3.6.2. Each was checked against the AGS 3.4.3 and 3.6.2 engine source.
+
+- **Object views keep their frame.** Under Script API "Highest", `Object.SetView(view)` now starts at loop 0, frame 0; AGS 3.4 kept the object's current loop and frame. The 18 calls not followed straight away by an `Animate` (rooms 1, 5, 10, 16, 21 and 23) now pass `Loop` and `Frame` themselves, which gives the AGS 3.4 result. The other 58 calls are followed by `Animate`, which sets the loop and frame anyway.
+- **Room event code runs only when meant to.** AGS 3.6 sends rooms more events (after fade-in, after fade-out, game saved, dialog start, options and stop). Room 3 ran `PlayMusic(12)` and hid the dream picture on each, because its `if` had no braces; the three setup lines are now one block. Room 32 reset the customer to Meadow on each, including during its four dialogs; it now does so only for the events AGS 3.4 sent.
+- **The ticket cursor matches the ticket.** AGS 3.6 no longer copies an inventory item's new picture to its cursor. The three places that change the ticket's number now set `Ticket.CursorGraphic` too. The ticket is the only item whose picture changes while its cursor matches it.
+- **The dream fades in.** Room 29 called `FadeIn(65)` halfway through its setup. AGS 3.4 then faded the room in again from black; AGS 3.6 skips the room's own fade-in once the screen is visible, so the dream popped in half set up. The early `FadeIn` is commented out, so the room's own fade-in shows the finished scene.
+- **Smooth scrolling on Linux.** The parallax module turned smooth scrolling off on Linux to work around a problem in an old emulator. AGS 3.6 builds a native Linux game, so the check is gone. Windows is unchanged.
+- **New save folder.** AGS 3.6.2 refuses to restore a save whose game data differs from the game (here, any save made before the fixes that added script variables, including the 2017 "Open Sores" build's). Without a restore check it shows "Unable to restore the saved game" or quits. Saves now go to `Cart Life (Open Sores 3.6)`, so players are not shown saves that cannot load. Later fixes that add script variables will break saves made with earlier builds of this port in the same way.
+- **Borderless fullscreen.** The project upgrade left "Fullscreen as borderless window" off, so fullscreen switched the monitor to a low display mode, which can fail or show a black screen on modern and multi-monitor PCs (compare the 2013 "resolution error" and "audio but no picture" reports). It is now on: fullscreen covers the desktop at its own resolution and scales the game in proportion. Players can still change it in the setup program.
+
+Checked and left alone: old-style `PlaySound` can now use channels 3-15 instead of 3-7, but sounds still fill the lowest free channel first, so the door sounds' `IsChannelPlaying(7)` checks behave as before, and the intro music never played on channel 4 in either version. A skipped cutscene now ends in the same faded state as a watched one (AGS 3.4 left the screen as it was when the player skipped), which is what each cutscene's following code expects. The checked-in `Compiled/acsetup.cfg` (DX5) is not used: AGS 3.6 writes the game's config from Game.agf (Direct3D 9).
+
 Script edits retain the existing Windows-1252 encoding. Existing local conversion and source changes have been preserved.
 
 ## How to build and play

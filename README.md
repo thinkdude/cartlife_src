@@ -29,11 +29,11 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 
 **Engine upgrade.** The game was made in AGS 3.2.1 and later moved to 3.4. It now builds and runs in **AGS 3.6.2**, after a few small script repairs. Places where AGS 3.6 behaves differently were checked against the engine source and adjusted, fullscreen now uses a borderless window, and saves go to a new `Cart Life (Open Sores 3.6)` folder because AGS 3.6.2 can't load saves from earlier builds.
 
-**Bug fixes.** 43 gameplay bugs are fixed, most of them reported by players on Steam, the original repository's [issue #2](https://github.com/gondur/cartlife_src/issues/2) and community walkthroughs. Highlights:
+**Bug fixes.** 48 gameplay bugs are fixed, most of them reported by players on Steam, the original repository's [issue #2](https://github.com/gondur/cartlife_src/issues/2) and community walkthroughs. Highlights:
 
 - Andrus no longer freezes in his cough pose, and nicotine withdrawal recovers properly.
 - Manual saves no longer overwrite each other or the character autosaves, and selecting nothing in the save menu no longer crashes.
-- The cash register keeps the money you see and the change you record in step, and quick clicks on the register key no longer fail a sale or check out twice.
+- The cash register keeps the money you see and the change you record in step, quick clicks on the register key no longer fail a sale or check out twice, and a sale that runs out of time no longer leaves the change tray full.
 - Hot-dog and bagel orders charge the right toppings, use ingredients once, and no longer crash with a four-item menu.
 - Purchases deliver what you paid for and record the right expense, and Melanie can no longer buy the $1200 stand into debt.
 - Short arrow-key taps select a character on the title screen.
@@ -41,6 +41,7 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 - Eddie's grudges last, Basinski and The Three keep their own schedules, and the Hollow Stump track no longer interferes with George.
 - "Everything" hot dogs charge for sauerkraut, sold-out special bagels leave the menu, and the arrow keys no longer walk through doors with a menu open.
 - Three customers answer ask-about topics in their own words, two leftover debug popups are gone, and the wallet sale and trailer chat play the right lines.
+- Melanie's week holds together: her phone alarms ring every school day, Seth collects Laura on Saturday morning, Laura has no school at the weekend, and missing Monday's hearing ends the game. The courthouse janitor's greyed-out sale button no longer starts a sale.
 
 The full list, with what was wrong and how it was repaired, is in **[PORTING-NOTES.md](PORTING-NOTES.md)**. The evidence for each fix (before and after results) is in [TEST-RESULTS.md](TEST-RESULTS.md), and the player reports checked against this port are in [COMMUNITY-BUGS.md](COMMUNITY-BUGS.md).
 
@@ -191,6 +192,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Fixes 9 Tier 2 bugs: Eddie's relationship resetting every night and his "not angry" check, the Hollow Stump music flag sharing George's slot, Basinski setting The Three's daily flag, unbilled sauerkraut on "everything" hot dogs, sold-out special bagels staying on the menu, the fast-service bonus never paying, arrow keys ignoring open menus at doors, and George's newspaper price complaint. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 24-32.
     - Fixes 11 Tier 3 bugs: debug popups, misspelled customer and topic names in ask-about, the wallet sale's extra refusal, the trailer chat's missing request, the giveaway popup and new-cart expense text, the stand's visibility in room 14, Melody's placement, the 15th menu item, and two unlinked pawn-shop handlers. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 33-43.
     - Adjusts seven places where AGS 3.6 behaves differently: object views keep their frame, room 3 and room 32 event code runs only when meant to, the ticket cursor matches the ticket, the dream in room 29 fades in, smooth scrolling also runs on Linux, saves use a new folder, and fullscreen uses a borderless window. See [PORTING-NOTES.md](PORTING-NOTES.md), AGS 3.6 behaviour adjustments.
+    - Fixes 5 bugs from the GameFAQs guide: Melanie's phone alarms, missing Monday's hearing, Saturday school and Seth's pickup, the change tray after a sale runs out of time, and the janitor's greyed-out sale button. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 44-48.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

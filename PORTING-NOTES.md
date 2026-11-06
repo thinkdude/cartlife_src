@@ -54,6 +54,14 @@
 42. With 15 or more menu items, every item can be ordered. `Spin()` rolled `Random(13)` for any menu of 14 or more.
 43. Two inventory items respond when offered at the pawn shop like their siblings: the Brennan permit (`Permit_brennan_Talk`) and the second room A-3 key (`A3Key2_Talk`). Both handlers were written but not linked in Game.agf.
 
+Repairs 44-48 fix bugs reported in the GameFAQs guide by T Schenkhuizen (version 1.9, see `COMMUNITY-BUGS.md`):
+
+44. Melanie's phone alarms ring on every school day. The school (7:30), pickup (3:30) and hearing (11:30) alarms were only re-armed when a bus or taxi ride crossed midnight, so after the first day the phone stayed quiet, and Wednesday's hearing alarm used up the flag Monday's needed. Each alarm is now re-armed earlier in the day. The school and pickup alarms ring only on weekdays while Laura is staying with Melanie.
+45. Missing Monday's final hearing ends Melanie's game. Her week ends when she meets Rebecca at the courthouse; if she never went, the game simply went on. Once the courthouse has closed on Monday (4pm), or on any later day, a notice says she missed the hearing and the existing ending for a failed hearing plays (request 620 runs the final check with the hearing counted as lost). It waits until no conversation, sale or drink is in progress.
+46. Seth collects Laura on Saturday morning, and Laura has no school at the weekend. Room 2 checked `day=="Saturday"`, but waking up moves `dayofweek` on and enters room 2 before `day` is refreshed, so on Saturday morning it still read "Friday": Seth didn't come, Laura waited at the door to be walked to school, and Seth came only if Melanie came home again later. Room 2 now checks `dayofweek`. Laura's school routine (coming down at 7, asking to walk, leaving at 8, waiting at the school at 4) now runs on weekdays only.
+47. The register's change tray is emptied before each customer pays. Only the register's normal close cleared the tray's slots. When time ran out, or the last item or cup went during a botched sale, the tray stayed full for the next customers: there was no room for change, and the drawer's bills or coins stayed hidden until a customer paid the exact amount. `ClearCashTray()` runs at the three places that set up a customer's payment.
+48. The courthouse janitor's greyed-out sale button does nothing. It started a sale anyway, and because only the goodbye path switched the option back on, the stand's sale button could stay grey afterwards (while still working). `BuyorTalk()` now sets the option each time, off only for the janitor in the courthouse, and the button checks it.
+
 ## AGS 3.6 behaviour adjustments
 
 These places behaved differently once the game was rebuilt with AGS 3.6.2. Each was checked against the AGS 3.4.3 and 3.6.2 engine source.

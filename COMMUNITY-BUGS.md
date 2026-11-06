@@ -5,7 +5,7 @@ Research date: 2026-10-22. These reports concern the original AGS game. Their ag
 ## Sources
 
 - [Combined bugs collected on Steam, source repository issue 2](https://github.com/gondur/cartlife_src/issues/2), opened 2016-04-26. This checkout's README directs bug reporting to that repository.
-- [Cart Life FAQ/walkthrough by T Schenkhuizen, version 1.6](https://gamefaqs.gamespot.com/pc/696505-cart-life-2013/faqs/68657), updated 2024-05-28. Includes a bugs section based on the author's playthroughs.
+- [Cart Life guide and walkthrough by T Schenkhuizen](https://gamefaqs.gamespot.com/pc/696505-cart-life-2013/faqs/68657), guide version 1.9 for game version 1.6, updated 2024-05-28. Includes a bugs section (section 10) based on the author's playthroughs. The whole guide was checked against the code again on 2026-11-06.
 - [Steam discussion with firsthand reports about extras, cookbooks and register cash](https://steamcommunity.com/app/233390/discussions/0/810919691033966496/), March 2013.
 - [Steam resolution/startup discussion](https://steamcommunity.com/app/233390/discussions/0/810919057063592571/), March 2013, including a developer response.
 
@@ -19,9 +19,13 @@ Research date: 2026-10-22. These reports concern the original AGS game. Their ag
 | Stand purchase can put Melanie in debt | FAQ | Reproduced at $0 and $1199.99. CL-026 rejects insufficient funds and preserves the balance. Exact and excess payment remain valid. |
 | Cash disappears from the register | Repository issue; Steam discussion | Earlier CL-007 repairs slot allocation, overflow and duplicate occupancy accounting. Cross-transaction cash retention is still a separate verification lead. |
 | Cookbooks cannot be read | Steam discussion; FAQ | Not reproduced through the live interaction in this pass. A missing Cookbook look handler already appears in compiler diagnostics; its intended behavior still needs investigation. |
-| Saturday school/custody inconsistencies | FAQ | Requires a longer Melanie playthrough; not reproduced here. |
-| Greyed sales control still responds, or remains grey after conversation | FAQ | Not reproduced here. |
-| `too_many_active_buttons` failure | FAQ | Not reproduced here. |
+| Saturday school/custody inconsistencies | FAQ | Found in the code and repaired (PORTING-NOTES repair 46). Seth's Saturday visit checked a day name that still read "Friday" just after waking up, and Laura's school routine ran every day. |
+| Missing the second custody hearing lets the game go on | FAQ | Found in the code and repaired (repairs 44 and 45). Nothing ended the game if Melanie never went, and the phone's hearing alarm never rang on Monday. |
+| Coins or bills vanish from the drawer and stay gone after a sale runs out of time | FAQ | Found in the code and repaired (repair 47). Only a normal register close emptied the change tray. |
+| Greyed sales control still responds, or remains grey after conversation | FAQ | Found in the code and repaired (repair 48). The janitor's button ignored its greyed state, and only the goodbye path ungreyed it. |
+| `too_many_active_buttons` failure | FAQ | Most likely AGS 3.4's limit of 15 GUI buttons animating at once ("AnimateButton: too many animating GUI buttons at once"). AGS 3.6.2 keeps an unlimited list, so it can't happen in this port. |
+| Laura sometimes can't be talked to in the morning; the woman with Andrus's cat is hard to talk to | FAQ | Not reproduced here. Most characters respond only when the player stands just to their left, which matches the guide's advice. Not changed. |
+| Thomas Kerchek's errand "bugs out" after the cigarettes | FAQ | Not reproduced here. The game removes one of his topics ("Kerchek's Reunion Story", which he brings up when you leave) every frame, so part of his story looks deliberately cut. Not changed. |
 | Oversized pedestrians or disappearing characters | FAQ; repository issue | Not reproduced here. |
 | Resolution/startup failure | Steam resolution discussion | This port previously launched successfully in its windowed setup. Other resolutions and hardware remain unverified. |
 

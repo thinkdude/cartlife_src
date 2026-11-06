@@ -25,7 +25,7 @@ Research date: 2026-10-22. These reports concern the original AGS game. Their ag
 | Greyed sales control still responds, or remains grey after conversation | FAQ | Found in the code and repaired (repair 48). The janitor's button ignored its greyed state, and only the goodbye path ungreyed it. |
 | `too_many_active_buttons` failure | FAQ | Most likely AGS 3.4's limit of 15 GUI buttons animating at once ("AnimateButton: too many animating GUI buttons at once"). AGS 3.6.2 keeps an unlimited list, so it can't happen in this port. |
 | Laura sometimes can't be talked to in the morning; the woman with Andrus's cat is hard to talk to | FAQ | Not reproduced here. Most characters respond only when the player stands just to their left, which matches the guide's advice. Not changed. |
-| Thomas Kerchek's errand "bugs out" after the cigarettes | FAQ | Not reproduced here. The game removes one of his topics ("Kerchek's Reunion Story", which he brings up when you leave) every frame, so part of his story looks deliberately cut. Not changed. |
+| Thomas Kerchek's errand "bugs out" after the cigarettes | FAQ | Not reproduced here. The game removes one of his topics ("Kerchek's Reunion Story", added when he describes his book) every frame, so part of his story looks deliberately cut. Not changed. |
 | Oversized pedestrians or disappearing characters | FAQ; repository issue | Not reproduced here. |
 | Resolution/startup failure | Steam resolution discussion | This port previously launched successfully in its windowed setup. Other resolutions and hardware remain unverified. |
 

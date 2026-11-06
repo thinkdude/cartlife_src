@@ -63,7 +63,7 @@
       <RoomTransition>FadeOutAndIn</RoomTransition>
       <RunGameLoopsWhileDialogOptionsDisplayed>False</RunGameLoopsWhileDialogOptionsDisplayed>
       <SaveGameFileExtension />
-      <SaveGameFolderName xml:space="preserve">Cart Life (Open Sores)</SaveGameFolderName>
+      <SaveGameFolderName xml:space="preserve">Cart Life (Open Sores 3.6)</SaveGameFolderName>
       <SaveScreenshots>True</SaveScreenshots>
       <ScaleCharacterSpriteOffsets>False</ScaleCharacterSpriteOffsets>
       <ScaleMovementSpeedWithMaskResolution>True</ScaleMovementSpeedWithMaskResolution>
@@ -96,7 +96,7 @@
       <CustomAppDataPath IsNull="True" />
       <CustomSavePath />
       <DigitalSound>Default</DigitalSound>
-      <FullscreenDesktop>False</FullscreenDesktop>
+      <FullscreenDesktop>True</FullscreenDesktop>
       <FullscreenGameScaling>ProportionalStretch</FullscreenGameScaling>
       <GameScaling>MaxInteger</GameScaling>
       <GameScalingMultiplier>1</GameScalingMultiplier>

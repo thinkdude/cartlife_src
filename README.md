@@ -27,7 +27,7 @@ More: [Cart Life on Wikipedia](https://en.wikipedia.org/wiki/Cart_Life)
 
 ## What this fork changes
 
-**Engine upgrade.** The game was made in AGS 3.2.1 and later moved to 3.4. It now builds and runs in **AGS 3.6.2**, after a few small script repairs.
+**Engine upgrade.** The game was made in AGS 3.2.1 and later moved to 3.4. It now builds and runs in **AGS 3.6.2**, after a few small script repairs. Places where AGS 3.6 behaves differently were checked against the engine source and adjusted, fullscreen now uses a borderless window, and saves go to a new `Cart Life (Open Sores 3.6)` folder because AGS 3.6.2 can't load saves from earlier builds.
 
 **Bug fixes.** 43 gameplay bugs are fixed, most of them reported by players on Steam, the original repository's [issue #2](https://github.com/gondur/cartlife_src/issues/2) and community walkthroughs. Highlights:
 
@@ -189,6 +189,7 @@ ALSO: This game uses the font "HOOGE" by Nicholay Dubina and Craig Kroeger, whic
     - Fixes 5 more bugs from the ranked bug list: customers that stop coming, a crash ordering from an empty menu, characters vanishing from other rooms, Faith's missing test replies, and doubled ask-about answers. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 19-23.
     - Fixes 9 Tier 2 bugs: Eddie's relationship resetting every night and his "not angry" check, the Hollow Stump music flag sharing George's slot, Basinski setting The Three's daily flag, unbilled sauerkraut on "everything" hot dogs, sold-out special bagels staying on the menu, the fast-service bonus never paying, arrow keys ignoring open menus at doors, and George's newspaper price complaint. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 24-32.
     - Fixes 11 Tier 3 bugs: debug popups, misspelled customer and topic names in ask-about, the wallet sale's extra refusal, the trailer chat's missing request, the giveaway popup and new-cart expense text, the stand's visibility in room 14, Melody's placement, the 15th menu item, and two unlinked pawn-shop handlers. See [PORTING-NOTES.md](PORTING-NOTES.md), repairs 33-43.
+    - Adjusts seven places where AGS 3.6 behaves differently: object views keep their frame, room 3 and room 32 event code runs only when meant to, the ticket cursor matches the ticket, the dream in room 29 fades in, smooth scrolling also runs on Linux, saves use a new folder, and fullscreen uses a borderless window. See [PORTING-NOTES.md](PORTING-NOTES.md), AGS 3.6 behaviour adjustments.
 - #####  "Open Sores" 0.1 - 2017-06-30
     - Now compiles successfully on AGS 3.4
     - Started reformatting / cleaning up code.

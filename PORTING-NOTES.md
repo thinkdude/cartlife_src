@@ -2,7 +2,7 @@
 
 ## Verified on 2026-10-21
 
-- Installed editor: `C:\Program Files (x86)\Adventure Game Studio 3.6.2\AGSEditor.exe`, version 3.6.2.21.
+- Editor: AGS Editor 3.6.2.21 (`AGSEditor.exe`).
 - Project: `cartlife\Game.agf`. This checkout already contained the editor's format conversion before this work.
 - Full build completed with exit code 0 and `AGS: Compilation successful!`.
 - Windows executable launched and displayed the Cart Life character-selection screen.

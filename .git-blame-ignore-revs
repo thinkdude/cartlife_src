@@ -4,10 +4,10 @@
 #   git config blame.ignoreRevsFile .git-blame-ignore-revs
 
 # Re-indent all game scripts (tools/agsfmt.py)
-2c0ab4e5f09bb428bc56b80daf0177abd0550d5c
+fb7dfa70b46bf9803c866f2d74c2fa50778b620d
 
 # Re-indent all game scripts with 4 spaces (tools/agsfmt.py)
-f9f813ab9812cd3bc32603fffaa2258addb8af7b
+f0976382829f1be4c29ad6e8b16c3c3a0a5130b9
 
 # Put multi-line block braces on their own lines (tools/agsfmt.py)
-4d3a96e8f03d630edfb634f676d8aada678dc47a
+6250c8487d9fe982ff7f5e4b7e9122ec1ccc02a6

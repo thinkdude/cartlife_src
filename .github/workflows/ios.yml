@@ -1,0 +1,131 @@
+# Builds the AGS 3.6 engine as an unsigned iOS app for Cart Life.
+#
+# The game files are not part of this build. They are added to the .ipa
+# afterwards, and the .ipa is then signed and installed from Windows.
+# See ios/README.md.
+
+name: iOS engine build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**']
+    paths:
+      - '.github/workflows/ios.yml'
+      - 'ios/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      # Same version as the AGS editor that compiles the game data.
+      AGS_TAG: v3.6.2.21
+    steps:
+      - name: Check out Cart Life iOS files
+        uses: actions/checkout@v5
+        with:
+          path: cartlife
+          sparse-checkout: |
+            ios
+
+      - name: Check out the AGS engine
+        uses: actions/checkout@v5
+        with:
+          repository: adventuregamestudio/ags
+          ref: ${{ env.AGS_TAG }}
+          path: ags
+
+      - name: Download engine libraries
+        working-directory: ags/libsrc
+        run: |
+          # GitHub regenerates commit tarballs from time to time, so the
+          # SDL_sound tarball no longer matches AGS's checksum. Take the
+          # same commit from git instead (git verifies it by its hash);
+          # download.sh then skips extracting it.
+          rev=$(sed -n 's/^SDLSOUND_VERSION=//p' download.sh)
+          git init --quiet SDL_sound
+          git -C SDL_sound fetch --quiet --depth 1 https://github.com/icculus/SDL_sound.git "$rev"
+          git -C SDL_sound checkout --quiet FETCH_HEAD
+          sed -i '' '/SDL_sound.tar.gz/d' sha1sums
+          ./download.sh > ../../download.log 2>&1 || { tail -50 ../../download.log; exit 1; }
+
+      - name: Set up the Xcode project for Cart Life
+        run: |
+          cp cartlife/ios/ios.cfg ags/iOS/misc/ios.cfg
+          python3 cartlife/ios/patch_xcodeproj.py ags/iOS/xcode/ags/AGS.xcodeproj
+          icons=ags/iOS/xcode/ags/AGS/Assets.xcassets/AppIcon.appiconset
+          cp cartlife/ios/AppIcon-1024.png "$icons/"
+          cat > "$icons/Contents.json" <<'JSON'
+          {
+            "images" : [
+              {
+                "filename" : "AppIcon-1024.png",
+                "idiom" : "universal",
+                "platform" : "ios",
+                "size" : "1024x1024"
+              }
+            ],
+            "info" : {
+              "author" : "xcode",
+              "version" : 1
+            }
+          }
+          JSON
+
+      - name: Build the app (unsigned)
+        run: |
+          xcodebuild -version
+          set +e
+          xcodebuild \
+            -project ags/iOS/xcode/ags/AGS.xcodeproj \
+            -scheme "AGS Game" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build > build.log 2>&1
+          status=$?
+          grep -E ': error:|\*\* BUILD' build.log | head -100
+          if [ $status -ne 0 ]; then tail -150 build.log; fi
+          exit $status
+
+      - name: Package the .ipa
+        run: |
+          app="build/Build/Products/Release-iphoneos/AGS Game.app"
+          mkdir -p out/Payload
+          cp -R "$app" out/Payload/CartLife.app
+          # The AGS project bundles empty placeholder game files. The real
+          # Cart Life files are added later, so drop the placeholders.
+          rm -f out/Payload/CartLife.app/game.ags \
+                out/Payload/CartLife.app/audio.vox \
+                out/Payload/CartLife.app/speech.vox \
+                out/Payload/CartLife.app/acsetup.cfg
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' out/Payload/CartLife.app/Info.plist
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' out/Payload/CartLife.app/Info.plist
+          find out/Payload/CartLife.app -maxdepth 2 | sort
+          test -d out/Payload/CartLife.app/Base.lproj/LaunchScreen.storyboardc
+          test -f out/Payload/CartLife.app/Assets.car
+          (cd out && zip -qry ../CartLife-iOS-engine-unsigned.ipa Payload)
+          ls -la CartLife-iOS-engine-unsigned.ipa
+
+      - name: Upload the .ipa
+        uses: actions/upload-artifact@v5
+        with:
+          name: CartLife-iOS-engine-unsigned
+          path: CartLife-iOS-engine-unsigned.ipa
+          retention-days: 30
+
+      - name: Upload the build log
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-log
+          path: |
+            build.log
+            download.log
+          if-no-files-found: ignore

@@ -57,6 +57,24 @@ jobs:
         run: |
           cp cartlife/ios/ios.cfg ags/iOS/misc/ios.cfg
           python3 cartlife/ios/patch_xcodeproj.py ags/iOS/xcode/ags/AGS.xcodeproj
+          icons=ags/iOS/xcode/ags/AGS/Assets.xcassets/AppIcon.appiconset
+          cp cartlife/ios/AppIcon-1024.png "$icons/"
+          cat > "$icons/Contents.json" <<'JSON'
+          {
+            "images" : [
+              {
+                "filename" : "AppIcon-1024.png",
+                "idiom" : "universal",
+                "platform" : "ios",
+                "size" : "1024x1024"
+              }
+            ],
+            "info" : {
+              "author" : "xcode",
+              "version" : 1
+            }
+          }
+          JSON
 
       - name: Build the app (unsigned)
         run: |
@@ -89,7 +107,9 @@ jobs:
                 out/Payload/CartLife.app/acsetup.cfg
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' out/Payload/CartLife.app/Info.plist
           /usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' out/Payload/CartLife.app/Info.plist
-          ls -la out/Payload/CartLife.app
+          find out/Payload/CartLife.app -maxdepth 2 | sort
+          test -d out/Payload/CartLife.app/Base.lproj/LaunchScreen.storyboardc
+          test -f out/Payload/CartLife.app/Assets.car
           (cd out && zip -qry ../CartLife-iOS-engine-unsigned.ipa Payload)
           ls -la CartLife-iOS-engine-unsigned.ipa
 

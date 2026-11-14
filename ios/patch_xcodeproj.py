@@ -7,17 +7,22 @@ Usage: python3 patch_xcodeproj.py path/to/AGS.xcodeproj
    target is the only one with a launch storyboard, so the two build
    configurations (Debug and Release) that set it are the ones to change.
 
-2. Turns off "Find Implicit Dependencies" in the "AGS Game" scheme. The
+2. Adds Engine/gfx/gfxfilter_aa_sdl_renderer.cpp to the engine framework's
+   sources. AGS 3.6.2 uses it (the software renderer's smooth filter) but
+   its Xcode project does not list it, so linking fails. AGS 3.6.3 added it
+   with these same object IDs; the step is skipped when it is already there.
+
+3. Bundles the launch screen and the asset catalog with the app. The
+   project has both files and names the launch screen in Info.plist, but
+   leaves them out of the app's Resources build phase. Without a launch
+   screen iOS may run the app in a small compatibility window.
+
+4. Turns off "Find Implicit Dependencies" in the "AGS Game" scheme. The
    app links SDL2.framework, and SDL's Xcode project has two targets that
    build it for iOS ("Framework" and "Framework-iOS"). With implicit
    dependencies on, Xcode builds both into the same place and stops with
    "Multiple commands produce SDL2.framework/SDL2". The project already
    depends on "Framework-iOS" explicitly.
-
-3. Adds Engine/gfx/gfxfilter_aa_sdl_renderer.cpp to the engine framework's
-   sources. AGS 3.6.2 uses it (the software renderer's smooth filter) but
-   its Xcode project does not list it, so linking fails. AGS 3.6.3 added it
-   with these same object IDs; the step is skipped when it is already there.
 """
 import os
 import sys
@@ -31,18 +36,20 @@ SCHEME = os.path.join("xcshareddata", "xcschemes", "AGS Game.xcscheme")
 IMPLICIT_ON = 'buildImplicitDependencies = "YES"'
 IMPLICIT_OFF = 'buildImplicitDependencies = "NO"'
 
+BUILD_FILES_END = "/* End PBXBuildFile section */"
+FILE_REFS_END = "/* End PBXFileReference section */"
 
 AA_FILE = "gfxfilter_aa_sdl_renderer"
 AA_BUILD = "E7680CCF2F09E9A400F864E2"
 AA_REF_CPP = "E7680CCD2F09E9A400F864E2"
 AA_REF_H = "E7680CCC2F09E9A400F864E2"
-# (line to find, lines to put before it or after it)
+# (line to find, "before" or "after" it, lines to add)
 AA_INSERTS = (
-    ("/* End PBXBuildFile section */", "before", (
+    (BUILD_FILES_END, "before", (
         f"\t\t{AA_BUILD} /* {AA_FILE}.cpp in Sources */ = {{isa = PBXBuildFile; "
         f"fileRef = {AA_REF_CPP} /* {AA_FILE}.cpp */; }};",
     )),
-    ("/* End PBXFileReference section */", "before", (
+    (FILE_REFS_END, "before", (
         f"\t\t{AA_REF_H} /* {AA_FILE}.h */ = {{isa = PBXFileReference; "
         f"lastKnownFileType = sourcecode.c.h; path = {AA_FILE}.h; "
         f'sourceTree = "<group>"; }};',
@@ -60,6 +67,35 @@ AA_INSERTS = (
         f"\t\t\t\t{AA_BUILD} /* {AA_FILE}.cpp in Sources */,",
     )),
 )
+
+# Existing file references: the asset catalog and the launch screen.
+ASSETS_REF = "2015598E290D9DF8005E5B22"
+LAUNCH_REF = "20155990290D9DF8005E5B22"
+ASSETS_BUILD = "C0FFEE000000000000000001"
+LAUNCH_BUILD = "C0FFEE000000000000000002"
+RESOURCE_INSERTS = (
+    (BUILD_FILES_END, "before", (
+        f"\t\t{ASSETS_BUILD} /* Assets.xcassets in Resources */ = {{isa = PBXBuildFile; "
+        f"fileRef = {ASSETS_REF} /* Assets.xcassets */; }};",
+        f"\t\t{LAUNCH_BUILD} /* LaunchScreen.storyboard in Resources */ = {{isa = PBXBuildFile; "
+        f"fileRef = {LAUNCH_REF} /* LaunchScreen.storyboard */; }};",
+    )),
+    # the app's Resources build phase
+    ("1CA110822B1F858E00072E5B /* ios.cfg in Resources */,", "after", (
+        f"\t\t\t\t{ASSETS_BUILD} /* Assets.xcassets in Resources */,",
+        f"\t\t\t\t{LAUNCH_BUILD} /* LaunchScreen.storyboard in Resources */,",
+    )),
+)
+
+
+def insert_lines(lines, inserts):
+    for anchor, where, added in inserts:
+        found = [i for i, l in enumerate(lines) if l.strip() == anchor]
+        if len(found) != 1:
+            sys.exit(f"expected one line '{anchor}', found {len(found)}")
+        i = found[0] + (1 if where == "after" else 0)
+        lines[i:i] = [l + "\n" for l in added]
+    return lines
 
 
 def set_bundle_id(lines):
@@ -83,20 +119,22 @@ def add_aa_filter(lines):
     if any(AA_FILE in l for l in lines):
         print(f"{AA_FILE}.cpp is already in the project")
         return lines
-    for anchor, where, added in AA_INSERTS:
-        found = [i for i, l in enumerate(lines) if l.strip() == anchor]
-        if len(found) != 1:
-            sys.exit(f"expected one line '{anchor}', found {len(found)}")
-        i = found[0] + (1 if where == "after" else 0)
-        lines[i:i] = [l + "\n" for l in added]
     print(f"added {AA_FILE}.cpp to the engine sources")
-    return lines
+    return insert_lines(lines, AA_INSERTS)
+
+
+def add_app_resources(lines):
+    if any("LaunchScreen.storyboard in Resources" in l for l in lines):
+        print("the launch screen is already bundled")
+        return lines
+    print("bundled the launch screen and asset catalog")
+    return insert_lines(lines, RESOURCE_INSERTS)
 
 
 def patch_project(path):
     with open(path, encoding="utf-8") as f:
         lines = f.readlines()
-    lines = add_aa_filter(set_bundle_id(lines))
+    lines = add_app_resources(add_aa_filter(set_bundle_id(lines)))
     with open(path, "w", encoding="utf-8") as f:
         f.writelines(lines)
 

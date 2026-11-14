@@ -17,7 +17,7 @@ It checks out AGS at the same version as the editor that compiles the game (`AGS
 Cart Life's settings:
 
 - `ios.cfg` replaces the AGS default. Landscape only (`rotation = 2`), OpenGL drawing the game at 640x400 and scaling it up (`renderer = 2`), sharp pixels (`smoothing = 0`) and black bars instead of stretching (`scaling = 1`). One finger works the mouse: a tap is a click, and holding and dragging moves the cursor.
-- `patch_xcodeproj.py` gives the app the bundle ID `io.github.thinkdude.cartlife` and the home-screen name "Cart Life". The AGS project leaves the bundle ID empty on purpose.
+- `patch_xcodeproj.py` gives the app the bundle ID `io.github.thinkdude.cartlife` and the home-screen name "Cart Life" (the AGS project leaves the bundle ID empty on purpose). It also turns off the scheme's implicit dependencies, which otherwise make Xcode build SDL2.framework twice and stop.
 
 ## 2. Add the game files
 

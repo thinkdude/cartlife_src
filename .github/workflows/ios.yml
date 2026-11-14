@@ -56,7 +56,7 @@ jobs:
       - name: Set up the Xcode project for Cart Life
         run: |
           cp cartlife/ios/ios.cfg ags/iOS/misc/ios.cfg
-          python3 cartlife/ios/patch_xcodeproj.py ags/iOS/xcode/ags/AGS.xcodeproj/project.pbxproj
+          python3 cartlife/ios/patch_xcodeproj.py ags/iOS/xcode/ags/AGS.xcodeproj
 
       - name: Build the app (unsigned)
         run: |

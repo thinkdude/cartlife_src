@@ -26,21 +26,32 @@ jobs:
       AGS_TAG: v3.6.2.21
     steps:
       - name: Check out Cart Life iOS files
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: cartlife
           sparse-checkout: |
             ios
 
       - name: Check out the AGS engine
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: adventuregamestudio/ags
           ref: ${{ env.AGS_TAG }}
           path: ags
 
       - name: Download engine libraries
-        run: ags/libsrc/download.sh > download.log 2>&1 || { tail -50 download.log; exit 1; }
+        working-directory: ags/libsrc
+        run: |
+          # GitHub regenerates commit tarballs from time to time, so the
+          # SDL_sound tarball no longer matches AGS's checksum. Take the
+          # same commit from git instead (git verifies it by its hash);
+          # download.sh then skips extracting it.
+          rev=$(sed -n 's/^SDLSOUND_VERSION=//p' download.sh)
+          git init --quiet SDL_sound
+          git -C SDL_sound fetch --quiet --depth 1 https://github.com/icculus/SDL_sound.git "$rev"
+          git -C SDL_sound checkout --quiet FETCH_HEAD
+          sed -i '' '/SDL_sound.tar.gz/d' sha1sums
+          ./download.sh > ../../download.log 2>&1 || { tail -50 ../../download.log; exit 1; }
 
       - name: Set up the Xcode project for Cart Life
         run: |
@@ -83,7 +94,7 @@ jobs:
           ls -la CartLife-iOS-engine-unsigned.ipa
 
       - name: Upload the .ipa
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: CartLife-iOS-engine-unsigned
           path: CartLife-iOS-engine-unsigned.ipa
@@ -91,7 +102,7 @@ jobs:
 
       - name: Upload the build log
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-log
           path: |

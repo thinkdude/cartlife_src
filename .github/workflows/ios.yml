@@ -1,0 +1,100 @@
+# Builds the AGS 3.6 engine as an unsigned iOS app for Cart Life.
+#
+# The game files are not part of this build. They are added to the .ipa
+# afterwards, and the .ipa is then signed and installed from Windows.
+# See ios/README.md.
+
+name: iOS engine build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**']
+    paths:
+      - '.github/workflows/ios.yml'
+      - 'ios/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      # Same version as the AGS editor that compiles the game data.
+      AGS_TAG: v3.6.2.21
+    steps:
+      - name: Check out Cart Life iOS files
+        uses: actions/checkout@v4
+        with:
+          path: cartlife
+          sparse-checkout: |
+            ios
+
+      - name: Check out the AGS engine
+        uses: actions/checkout@v4
+        with:
+          repository: adventuregamestudio/ags
+          ref: ${{ env.AGS_TAG }}
+          path: ags
+
+      - name: Download engine libraries
+        run: ags/libsrc/download.sh > download.log 2>&1 || { tail -50 download.log; exit 1; }
+
+      - name: Set up the Xcode project for Cart Life
+        run: |
+          cp cartlife/ios/ios.cfg ags/iOS/misc/ios.cfg
+          python3 cartlife/ios/patch_xcodeproj.py ags/iOS/xcode/ags/AGS.xcodeproj/project.pbxproj
+
+      - name: Build the app (unsigned)
+        run: |
+          xcodebuild -version
+          set +e
+          xcodebuild \
+            -project ags/iOS/xcode/ags/AGS.xcodeproj \
+            -scheme "AGS Game" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build > build.log 2>&1
+          status=$?
+          grep -E ': error:|\*\* BUILD' build.log | head -100
+          if [ $status -ne 0 ]; then tail -150 build.log; fi
+          exit $status
+
+      - name: Package the .ipa
+        run: |
+          app="build/Build/Products/Release-iphoneos/AGS Game.app"
+          mkdir -p out/Payload
+          cp -R "$app" out/Payload/CartLife.app
+          # The AGS project bundles empty placeholder game files. The real
+          # Cart Life files are added later, so drop the placeholders.
+          rm -f out/Payload/CartLife.app/game.ags \
+                out/Payload/CartLife.app/audio.vox \
+                out/Payload/CartLife.app/speech.vox \
+                out/Payload/CartLife.app/acsetup.cfg
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' out/Payload/CartLife.app/Info.plist
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' out/Payload/CartLife.app/Info.plist
+          ls -la out/Payload/CartLife.app
+          (cd out && zip -qry ../CartLife-iOS-engine-unsigned.ipa Payload)
+          ls -la CartLife-iOS-engine-unsigned.ipa
+
+      - name: Upload the .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: CartLife-iOS-engine-unsigned
+          path: CartLife-iOS-engine-unsigned.ipa
+          retention-days: 30
+
+      - name: Upload the build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: |
+            build.log
+            download.log
+          if-no-files-found: ignore
